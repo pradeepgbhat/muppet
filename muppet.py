@@ -57,9 +57,20 @@ def execute_file_create(fileObj):
   except KeyError:
      print('Group ' + str(fileObj['group']) + ' for file ' + str(fileObj['path'])  + ' does not exist will not change group ID from default.')
  
-  #print(gid) 
-  os.chown(filename, uid, gid)
+  #print(gid)
+  try : 
+    os.chown(filename, uid, gid)  
+  except OSError as error : 
+    print(error) 
+  
   print("Changed file " + filename + "ownership to uid and gid " + str(uid) + ", " + str(gid))
+  perms = fileObj['permissions']
+  perms = int(perms,8)
+  try :
+    os.chmod(filename, perms)
+    print("Changed file " + filename + " permission to " + oct(perms) )
+  except OSError as error :
+    print(error) 
         
 
 #Handling for write_file option function for validating yaml keys
