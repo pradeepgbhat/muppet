@@ -1,0 +1,28 @@
+write_file:
+  - path: /opt/slack/create/content.php
+    permissions: "0644"
+    owner: 'I334689' 
+    group: 'I334689'
+    content: | 
+          <?php 
+          header("Content-Type: text/plain"); 
+          echo "Hello, world!\n";
+    runcmd: echo "hello"
+#    pingcheck: hello
+
+  - path: /opt/slack/create/index.php
+    permissions: "0644"
+    owner: 'pradeep'
+    group: 'pradeep'
+    content: |
+          <?php
+          header("Content-Type: text/plain");
+          echo "Hello, world!\n";
+    runcmd: echo "hello"
+
+package:
+   - name: "apache"
+     action: "install"
+     version: "1.4"
+     runcmd: restart 
+      
