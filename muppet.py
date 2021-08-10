@@ -1,7 +1,6 @@
 import sys
 import os
 import yaml
-import json
 import pwd
 import grp
 from pathlib import Path
@@ -42,36 +41,47 @@ def read_yaml(filename):
 #Execute File create
 def execute_file_create(fileObj):
   filename = fileObj['path']
+  #set default userid and groupid
   uid = 0
   gid = 0
-  os.makedirs(os.path.dirname(filename), exist_ok=True)
-  with open(filename, "w") as f:
-          f.write(fileObj['content'])
-  try:
-     uid = pwd.getpwnam(fileObj['owner']).pw_uid
-  except KeyError:
-     print('User ' + str(fileObj['owner']) + ' for file ' + str(fileObj['path'])  + ' does not exist will not change ownership from default.')
-
-  try:
-     gid = grp.getgrnam(fileObj['group'])
-  except KeyError:
-     print('Group ' + str(fileObj['group']) + ' for file ' + str(fileObj['path'])  + ' does not exist will not change group ID from default.')
- 
-  #print(gid)
-  try : 
-    os.chown(filename, uid, gid)  
-  except OSError as error : 
-    print(error) 
   
-  print("Changed file " + filename + "ownership to uid and gid " + str(uid) + ", " + str(gid))
-  perms = fileObj['permissions']
-  perms = int(perms,8)
   try :
-    os.chmod(filename, perms)
-    print("Changed file " + filename + " permission to " + oct(perms) )
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    with open(filename, "w") as f:
+          f.write(fileObj['content'])
   except OSError as error :
-    print(error) 
-        
+    print(error)
+ 
+  muppet_file = Path(filename)
+  if muppet_file.exists():
+     #set userid for ownership 
+     try:
+        uid = pwd.getpwnam(fileObj['owner']).pw_uid
+     except KeyError:
+        print('User ' + str(fileObj['owner']) + ' for file ' + str(fileObj['path'])  + ' does not exist will not change ownership from default.')
+  
+     #set groupid
+     try:
+        gid = grp.getgrnam(fileObj['group'])
+     except KeyError:
+        print('Group ' + str(fileObj['group']) + ' for file ' + str(fileObj['path'])  + ' does not exist will not change group ID from default.')
+ 
+     #Change ownership
+     try: 
+        os.chown(filename, uid, gid)  
+     except OSError as error : 
+        print(error) 
+     print("Changed file " + filename + "ownership to uid and gid " + str(uid) + ", " + str(gid))
+
+     perms = fileObj['permissions']
+     perms = int(perms,8)
+     
+     try:
+        os.chmod(filename, perms)
+        print("Changed file " + filename + " permission to " + oct(perms) )
+     except OSError as error :
+        print(error) 
+         
 
 #Handling for write_file option function for validating yaml keys
 def file_create_handler(input_file):
@@ -88,7 +98,7 @@ def file_create_handler(input_file):
        execute_file_create(file_create_yaml['write_file'][fileNum])
               
 #package handling
-def package_install(input_file):
+def package_install_handler(input_file):
   print("in package_install()")
   print(input_file)
   read_yaml(input_file[1])
@@ -97,7 +107,7 @@ def select_func(check_in):
   if check_in[0] == 'write_file':
      file_create_handler(check_in)
   if check_in[0] == 'package':
-     package_install(check_in)
+     package_install_handler(check_in)
 
 
 pre_check = pre_check()
