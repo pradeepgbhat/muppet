@@ -21,7 +21,7 @@ write_file:
     runcmd: echo "hello"
 
 package:
-   - name: "ucf"
+   - name: "apache2"
      action: "install"
-     version: "3.0038"
+     version: "2.4.29-1ubuntu4.16"
      runcmd: restart 

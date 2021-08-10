@@ -84,6 +84,29 @@ def execute_file_create(fileObj):
      except OSError as error :
         print(error) 
 
+def check_package_avail(packObj):
+    package_name = packObj['name']
+    package_version = packObj['version']
+    try:
+        apt_cache_ver = "apt-cache show " + package_name + "|grep Version|uniq|awk '{print $2}'"
+        apt_cache_res = subprocess.Popen(apt_cache_ver,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE);
+        apt_cache_out,error = apt_cache_res.communicate()
+        pkg_list_avail = apt_cache_out.decode("UTF-8").strip().split('\n')
+        if (package_version in pkg_list_avail):
+            print("Package " +  package_name + ":" + package_version + " is available")
+            return True
+        else:
+            print("Package " +  package_name + ":" + package_version + " is not available")
+            return False
+    except OSError as e:
+      print("OSError > " + str(e.errno))
+      print("OSError > " + str(e.strerror))
+      print("OSError > " + str(e.filename))
+      exit()
+    except:
+      print("Error > " + str(sys.exc_info()[0]))
+      exit()
+
 def check_package_installed(packObj):
     package_name = packObj['name']
     package_version = packObj['version']
@@ -97,11 +120,10 @@ def check_package_installed(packObj):
           install_status = ast.literal_eval(dpkg_out.decode("UTF-8"))
           if(install_status.get('version') == packObj['version'] and install_status.get('status') == 'install ok installed' and install_status.get('version') == packObj['version']):
               print("Package is already installed: " + package_name + ":" + package_version)
-              return install_status 
-          else:
-              print("Package is not installed:" + package_name + ":" + package_version)
-              return install_status 
-
+              return True 
+      else:
+          print("Package is not installed:" + package_name + ":" + package_version)
+          return False
       if error:
           print("Error> error " + str(error.strip()))
     except OSError as e:
@@ -109,15 +131,21 @@ def check_package_installed(packObj):
       print("OSError > " + str(e.strerror))
       print("OSError > " + str(e.filename))
       exit()
-
     except:
       print("Error > " + str(sys.exc_info()[0]))
       exit()
 
+def install_package(packObj):
+    print("In Install package")
 
 def execute_package_install(packObj):
+    check_available = check_package_avail(packObj)
     package_status = check_package_installed(packObj)
-    print(package_status)
+    if (package_status == False) and (check_available == True):
+        install_package(packObj)
+    else:
+        print("Nothing to do for package" + packObj['name'])
+
 
 #Handling for write_file option function for validating yaml keys
 def file_create_handler(input_file):
