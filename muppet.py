@@ -2,7 +2,9 @@ import sys
 import os
 import yaml
 import pwd
+import subprocess
 import grp
+import ast
 from pathlib import Path
 
 #Operations supported
@@ -81,9 +83,41 @@ def execute_file_create(fileObj):
         print("Changed file " + filename + " permission to " + oct(perms) )
      except OSError as error :
         print(error) 
-         
+
+def check_package_installed(packObj):
+    package_name = packObj['name']
+    package_version = packObj['version']
+    try:
+      dpkg_query = "dpkg-query -W '-f={\"name\":\"${package}\", \"version\":\"${version}\", \"status\":\"${status}\"}'" 
+      dpkg_ver = dpkg_query + " " + package_name
+      print("Checking if package is installed: " + package_name + ":" + package_version)
+      dpkg_res = subprocess.Popen(dpkg_ver,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE);
+      dpkg_out,error = dpkg_res.communicate()
+      if dpkg_out:
+          install_status = ast.literal_eval(dpkg_out.decode("UTF-8"))
+          if(install_status.get('version') == packObj['version'] and install_status.get('status') == 'install ok installed' and install_status.get('version') == packObj['version']):
+              print("Package is already installed: " + package_name + ":" + package_version)
+              return install_status 
+          else:
+              print("Package is not installed:" + package_name + ":" + package_version)
+              return install_status 
+
+      if error:
+          print("Error> error " + str(error.strip()))
+    except OSError as e:
+      print("OSError > " + str(e.errno))
+      print("OSError > " + str(e.strerror))
+      print("OSError > " + str(e.filename))
+      exit()
+
+    except:
+      print("Error > " + str(sys.exc_info()[0]))
+      exit()
+
+
 def execute_package_install(packObj):
-   print(packObj) 
+    package_status = check_package_installed(packObj)
+    print(package_status)
 
 #Handling for write_file option function for validating yaml keys
 def file_create_handler(input_file):
@@ -116,7 +150,6 @@ def package_install_handler(input_file):
              break;
      execute_package_install(package_install_yaml['package'][packNum])
  
-
 def select_func(check_in):
   if check_in[0] == 'write_file':
      file_create_handler(check_in)
