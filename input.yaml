@@ -21,7 +21,7 @@ write_file:
     runcmd: echo "hello"
 
 package:
-   - name: "apache"
+   - name: "apache2"
      action: "install"
      version: "1.4"
      runcmd: restart 

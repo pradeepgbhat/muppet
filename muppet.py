@@ -82,6 +82,8 @@ def execute_file_create(fileObj):
      except OSError as error :
         print(error) 
          
+def execute_package_install(packObj):
+   print(packObj) 
 
 #Handling for write_file option function for validating yaml keys
 def file_create_handler(input_file):
@@ -99,16 +101,27 @@ def file_create_handler(input_file):
               
 #package handling
 def package_install_handler(input_file):
-  print("in package_install()")
+  #print("in package_install()")
+  pack_params = ['runcmd','name', 'action','version']
   print(input_file)
-  read_yaml(input_file[1])
+  package_install_yaml = read_yaml(input_file[1])
+  print(package_install_yaml.keys())
+  for packNum in range(len(package_install_yaml['package'])):
+    # print(package_install_yaml['package'][packNum])
+     for key in package_install_yaml['package'][packNum].keys():
+         for key in package_install_yaml['package'][packNum].keys():
+           if key not in pack_params:
+             exit("parameter for " + key + " for package  in " + input_file[1] + " yaml is invalid.Exiting....")
+           else:
+             break;
+     execute_package_install(package_install_yaml['package'][packNum])
+ 
 
 def select_func(check_in):
   if check_in[0] == 'write_file':
      file_create_handler(check_in)
   if check_in[0] == 'package':
      package_install_handler(check_in)
-
 
 pre_check = pre_check()
 select_func(pre_check)
