@@ -59,7 +59,6 @@ package:
      runcmd: echo "hello" #any valid shell command, could be used to restart service
 ```
 # Example Install of Apache2 and PHP running on Ubuntu 18.04
-
 Clone this repository on to the target system and from the repository directory execute the following commands.
  
 ```
@@ -68,7 +67,8 @@ Clone this repository on to the target system and from the repository directory 
 ```
 2) $sudo python3 write_file post_pkg_install_files.yaml
 ```
+Ref: https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-ubuntu-18-04
+
 # caveats
 does not handle dependencies of packages.\
-does not handle ordering of installation and file creation.\
-Disable ubuntu file using runcmd if required to access publicly.\
+does not handle ordering of installation and file creation.
