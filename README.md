@@ -58,7 +58,17 @@ package:
      version: "2.4.29-1ubuntu4.16" #version has to be specified, cannot use "latest" yet like puppet
      runcmd: echo "hello" #any valid shell command, could be used to restart service
 ```
+# Example Install of Apache2 and PHP running on Ubuntu 18.04
 
+Clone this repository on to the target system and from the repository directory execute the following commands.
+1) 
+```
+sudo python3 package packages.yaml
+```
+2) 
+```
+sudo python3 write_file post_pkg_install_files.yaml
+```
 # caveats
 does not handle dependencies of packages.
 does not handle ordering of installation and file creation
