@@ -40,6 +40,28 @@ def read_yaml(filename):
      exit("Could not load yaml")
   return yaml_content
 
+
+def call_runcmd(artifactObj):
+    print(artifactObj['runcmd'])
+    try:
+      runcmd_ver = artifactObj['runcmd']
+      print("executing runcmd: "  + runcmd_ver)
+      runcmd_res = subprocess.Popen(runcmd_ver,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE);
+      runcmd_out,error = runcmd_res.communicate()
+      if runcmd_out:
+          print(runcmd_out)
+      if error:
+          print("Error> error " + str(error.strip()))
+    except OSError as e:
+      print("OSError > " + str(e.errno))
+      print("OSError > " + str(e.strerror))
+      print("OSError > " + str(e.filename))
+      exit()
+    except:
+      print("Error > " + str(sys.exc_info()[0]))
+      exit()
+
+
 #Execute File create
 def execute_file_create(fileObj):
   filename = fileObj['path']
@@ -113,14 +135,18 @@ def check_package_installed(packObj):
     try:
       dpkg_query = "dpkg-query -W '-f={\"name\":\"${package}\", \"version\":\"${version}\", \"status\":\"${status}\"}'" 
       dpkg_ver = dpkg_query + " " + package_name
+      print(dpkg_ver)
       print("Checking if package is installed: " + package_name + ":" + package_version)
       dpkg_res = subprocess.Popen(dpkg_ver,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE);
       dpkg_out,error = dpkg_res.communicate()
       if dpkg_out:
           install_status = ast.literal_eval(dpkg_out.decode("UTF-8"))
-          if(install_status.get('version') == packObj['version'] and install_status.get('status') == 'install ok installed' and install_status.get('version') == packObj['version']):
+          if(install_status.get('status') == 'install ok installed' and install_status.get('version') == packObj['version']):
               print("Package is already installed: " + package_name + ":" + package_version)
               return True 
+          else:
+              return False
+
       else:
           print("Package is not installed:" + package_name + ":" + package_version)
           return False
@@ -142,7 +168,7 @@ def manage_package(packObj):
     package_action = packObj['action']
     
     try:
-      apt_query = "apt-get " + package_action + " --dry-run -y"
+      apt_query = "apt-get " + package_action + " -y"
       apt_ver = apt_query + " " + package_name + "=" + package_version
       print(apt_ver)
       print("Performing action " + package_action  + " for  package: " + package_name + ":" + package_version)
@@ -153,7 +179,6 @@ def manage_package(packObj):
           print("Action " + package_action  + " successful for  package: " + package_name + ":" + package_version)
       if error:
           print("Error> error " + str(error.strip()))
-          print("Action " + package_action  + " unsuccessful for  package: " + package_name + ":" + package_version)
     except OSError as e:
       print("OSError > " + str(e.errno))
       print("OSError > " + str(e.strerror))
@@ -176,12 +201,16 @@ def execute_package_manager(packObj):
         package_status = check_package_installed(packObj)
         if (package_status == False) and (check_available == True):
             manage_package(packObj)
+            print("runcmd: " + packObj['action'] + " will execute as package is installed" )
+            call_runcmd(packObj)
         else:
             print("Nothing to do for package " + packObj['name'])
+            print("runcmd: " + packObj['action'] + " will not be executed as package is not installed" )
     elif (packObj['action'] == 'remove'):
         package_status = check_package_installed(packObj)
         if (package_status == True):
             manage_package(packObj)
+            print("runcmd: " + packObj['action'] + " will not be executed as it is package removal" )
         else:
             print("Nothing to do for package " + packObj['name'])
 

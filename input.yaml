@@ -12,7 +12,8 @@ write_file:
           ErrorLog ${APACHE_LOG_DIR}/error.log
           CustomLog ${APACHE_LOG_DIR}/access.log combined
          </VirtualHost> 
-    runcmd: sudo a2ensite your_domain.conf;sudo a2dissite 000-default.conf;systemctl restart apache2
+    #runcmd: sudo a2ensite your_domain.conf;sudo a2dissite 000-default.conf;systemctl restart apache2
+    runcmd: echo "hello"
 
   - path: /etc/apache2/mods-enabled/dir.conf
     permissions: "0644"
@@ -23,6 +24,14 @@ write_file:
            DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
          </IfModule>    
     runcmd: echo "hello"
+
+  - path: /etc/apache2/mods-enabled/script-enable-php-site
+    permissions: "0755"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+         a2ensite your_domain.conf;a2dissite 000-default.conf;systemctl restart apache2
+    runcmd: "ls -l /etc/apache2/mods-enabled/script-enable-php-site" 
 
   - path: /var/www/your_domain/index.html
     permissions: "0644"
@@ -53,15 +62,15 @@ package:
    - name: "apache2"
      action: "install"
      version: "2.4.29-1ubuntu4.16"
-     runcmd: restart 
+     runcmd: echo "hello"
 
    - name: "php"
      action: "install"
      version: "1:7.2+60ubuntu1"
-     runcmd: restart
+     runcmd: echo "hello"
 
    - name: "libapache2-mod-php"
      action: "install"
      version: "1:7.2+60ubuntu1"
-     runcmd: restart
+     runcmd: "bash /etc/apache2/mods-enabled/script-enable-php-site"
      

@@ -1,0 +1,25 @@
+write_files:
+  - path: /var/www/your_domain/index.html
+    permissions: "0644"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+          <html>
+           <head>
+             <title>Welcome to Your_domain!</title>
+          </head>
+          <body>
+           <h1>Success!  The your_domain server block is working!</h1>
+           </body>
+          </html>
+    runcmd: echo "hello"
+
+  - path: /var/www/your_domain/info.php
+    permissions: "0644"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+          <?php
+          header("Content-Type: text/plain");
+          echo "Hello, world!\n";
+    runcmd: echo "hello"
