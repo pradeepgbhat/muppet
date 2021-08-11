@@ -69,6 +69,6 @@ Clone this repository on to the target system and from the repository directory 
 2) $sudo python3 write_file post_pkg_install_files.yaml
 ```
 # caveats
-does not handle dependencies of packages.
-does not handle ordering of installation and file creation
-Disable ubuntu file using runcmd if required to access publicly
+does not handle dependencies of packages.\
+does not handle ordering of installation and file creation.\
+Disable ubuntu file using runcmd if required to access publicly.\
