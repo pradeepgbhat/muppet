@@ -1,23 +1,52 @@
 write_file:
-  - path: /opt/slack/create/content.php
+  - path: /etc/apache2/sites-available/your_domain.conf
     permissions: "0644"
-    owner: 'I334689' 
-    group: 'I334689'
+    owner: 'apache2' 
+    group: 'apache2'
     content: | 
-          <?php 
-          header("Content-Type: text/plain"); 
-          echo "Hello, world!\n";
-    runcmd: echo "hello"
-#    pingcheck: hello
+         <VirtualHost *:80>
+          ServerAdmin webmaster@localhost
+          ServerName your_domain
+          ServerAlias www.your_domain
+          DocumentRoot /var/www/your_domain
+          ErrorLog ${APACHE_LOG_DIR}/error.log
+          CustomLog ${APACHE_LOG_DIR}/access.log combined
+         </VirtualHost> 
+    runcmd: sudo a2ensite your_domain.conf;sudo a2dissite 000-default.conf;systemctl restart apache2
 
-  - path: /opt/slack/create/index.php
+  - path: /etc/apache2/mods-enabled/dir.conf
     permissions: "0644"
-    owner: 'pradeep'
-    group: 'pradeep'
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+         <IfModule mod_dir.c>
+           DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+         </IfModule>    
+    runcmd: echo "hello"
+
+  - path: /var/www/your_domain/index.html
+    permissions: "0644"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+          <html>
+           <head>
+             <title>Welcome to Your_domain!</title>
+          </head>
+          <body>
+           <h1>Success!  The your_domain server block is working!</h1>
+           </body>
+          </html>
+    runcmd: echo "hello"
+
+  - path: /var/www/your_domain/info.php
+    permissions: "0644"
+    owner: 'apache2'
+    group: 'apache2'
     content: |
           <?php
           header("Content-Type: text/plain");
-          echo "Hello, world!\n";
+          echo "Hello, world!\n"; 
     runcmd: echo "hello"
 
 package:
@@ -25,3 +54,14 @@ package:
      action: "install"
      version: "2.4.29-1ubuntu4.16"
      runcmd: restart 
+
+   - name: "php"
+     action: "install"
+     version: "1:7.2+60ubuntu1"
+     runcmd: restart
+
+   - name: "libapache2-mod-php"
+     action: "install"
+     version: "1:7.2+60ubuntu1"
+     runcmd: restart
+     

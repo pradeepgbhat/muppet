@@ -48,6 +48,7 @@ def execute_file_create(fileObj):
   gid = 0
   try :
     os.makedirs(os.path.dirname(filename), exist_ok=True)
+    print("Writing file: " + filename )
     with open(filename, "w") as f:
           f.write(fileObj['content'])
   except OSError as error :
@@ -72,7 +73,7 @@ def execute_file_create(fileObj):
         os.chown(filename, uid, gid)  
      except OSError as error : 
         print(error) 
-     print("Changed file " + filename + "ownership to uid and gid " + str(uid) + ", " + str(gid))
+     print("Changed file " + filename + " ownership to uid and gid " + str(uid) + ", " + str(gid))
 
      perms = fileObj['permissions']
      perms = int(perms,8)
@@ -134,11 +135,34 @@ def check_package_installed(packObj):
       print("Error > " + str(sys.exc_info()[0]))
       exit()
 
-def install_package(packObj):
-    print("In Install package")
+def manage_package(packObj):
+    print("In Manage package")
+    package_name = packObj['name']
+    package_version = packObj['version']
+    package_action = packObj['action']
+    
+    try:
+      apt_query = "apt-get " + package_action + " --dry-run -y"
+      apt_ver = apt_query + " " + package_name + "=" + package_version
+      print(apt_ver)
+      print("Performing action " + package_action  + " for  package: " + package_name + ":" + package_version)
+      apt_res = subprocess.Popen(apt_ver,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE);
+      apt_out,error = apt_res.communicate()
+      if apt_out:
+          print(apt_out)
+          print("Action " + package_action  + " successful for  package: " + package_name + ":" + package_version)
+      if error:
+          print("Error> error " + str(error.strip()))
+          print("Action " + package_action  + " unsuccessful for  package: " + package_name + ":" + package_version)
+    except OSError as e:
+      print("OSError > " + str(e.errno))
+      print("OSError > " + str(e.strerror))
+      print("OSError > " + str(e.filename))
+      exit()
+    except:
+      print("Error > " + str(sys.exc_info()[0]))
+      exit()
 
-def remova_package(packObj):
-    print("In remove package")
 
 def execute_package_manager(packObj):
     print(type(packObj['action']))
@@ -147,16 +171,17 @@ def execute_package_manager(packObj):
     if not (action == 'install' or action == 'remove'):
         print("Unknown action " + packObj['action'] + " for package " + packObj['name']  )
     elif (action == 'install'):
+        print("in install condition for " + packObj['name'])
         check_available = check_package_avail(packObj)
         package_status = check_package_installed(packObj)
         if (package_status == False) and (check_available == True):
-            install_package(packObj)
+            manage_package(packObj)
         else:
             print("Nothing to do for package " + packObj['name'])
     elif (packObj['action'] == 'remove'):
         package_status = check_package_installed(packObj)
-        if (package_status == False):
-            remove_package(packObj)
+        if (package_status == True):
+            manage_package(packObj)
         else:
             print("Nothing to do for package " + packObj['name'])
 
