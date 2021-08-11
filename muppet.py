@@ -46,7 +46,6 @@ def execute_file_create(fileObj):
   #set default userid and groupid
   uid = 0
   gid = 0
-  
   try :
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w") as f:
@@ -138,20 +137,34 @@ def check_package_installed(packObj):
 def install_package(packObj):
     print("In Install package")
 
-def execute_package_install(packObj):
-    check_available = check_package_avail(packObj)
-    package_status = check_package_installed(packObj)
-    if (package_status == False) and (check_available == True):
-        install_package(packObj)
-    else:
-        print("Nothing to do for package" + packObj['name'])
+def remova_package(packObj):
+    print("In remove package")
 
+def execute_package_manager(packObj):
+    print(type(packObj['action']))
+    print((packObj['action']))
+    action = str(packObj['action'])
+    if not (action == 'install' or action == 'remove'):
+        print("Unknown action " + packObj['action'] + " for package " + packObj['name']  )
+    elif (action == 'install'):
+        check_available = check_package_avail(packObj)
+        package_status = check_package_installed(packObj)
+        if (package_status == False) and (check_available == True):
+            install_package(packObj)
+        else:
+            print("Nothing to do for package " + packObj['name'])
+    elif (packObj['action'] == 'remove'):
+        package_status = check_package_installed(packObj)
+        if (package_status == False):
+            remove_package(packObj)
+        else:
+            print("Nothing to do for package " + packObj['name'])
 
 #Handling for write_file option function for validating yaml keys
 def file_create_handler(input_file):
   file_params = ['runcmd','path', 'permissions','group', 'owner', 'content']
   file_create_yaml = read_yaml(input_file[1])
-  print(file_create_yaml.keys())
+  # print(file_create_yaml.keys())
   # pyObj = len(file_create_yaml['write_file'])
   for fileNum in range(len(file_create_yaml['write_file'])):
        for key in file_create_yaml['write_file'][fileNum].keys():
@@ -176,7 +189,7 @@ def package_install_handler(input_file):
              exit("parameter for " + key + " for package  in " + input_file[1] + " yaml is invalid.Exiting....")
            else:
              break;
-     execute_package_install(package_install_yaml['package'][packNum])
+     execute_package_manager(package_install_yaml['package'][packNum])
  
 def select_func(check_in):
   if check_in[0] == 'write_file':
