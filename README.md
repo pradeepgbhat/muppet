@@ -15,9 +15,10 @@ sudo python3 [operation] [input yaml]
 ```
 
 supported operations
+```
 write_file: To create files in specific location on a linux box.
 package: To install or remove packages
-
+```
 ```
 sudo python3 package /opt/mnt/package.yaml
 ```
