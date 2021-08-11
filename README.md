@@ -61,13 +61,12 @@ package:
 # Example Install of Apache2 and PHP running on Ubuntu 18.04
 
 Clone this repository on to the target system and from the repository directory execute the following commands.
-1) 
+ 
 ```
-sudo python3 package packages.yaml
+1) $sudo python3 package packages.yaml
 ```
-2) 
 ```
-sudo python3 write_file post_pkg_install_files.yaml
+2) $sudo python3 write_file post_pkg_install_files.yaml
 ```
 # caveats
 does not handle dependencies of packages.
