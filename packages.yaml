@@ -2,15 +2,15 @@ package:
    - name: "apache2"
      action: "install"
      version: "2.4.29-1ubuntu4.16"
-     runcmd: echo "hello"
+     runcmd: echo "apache2"
 
    - name: "php"
      action: "install"
      version: "1:7.2+60ubuntu1"
-     runcmd: echo "hello"
+     runcmd: echo "php"
 
    - name: "libapache2-mod-php"
      action: "install"
      version: "1:7.2+60ubuntu1"
-     runcmd: "bash /etc/apache2/mods-enabled/script-enable-php-site"
+     runcmd: echo "libapache2"
 

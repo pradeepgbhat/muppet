@@ -105,6 +105,7 @@ def execute_file_create(fileObj):
         print("Changed file " + filename + " permission to " + oct(perms) )
      except OSError as error :
         print(error) 
+  call_runcmd(fileObj)
 
 def check_package_avail(packObj):
     package_name = packObj['name']
@@ -205,12 +206,12 @@ def execute_package_manager(packObj):
             call_runcmd(packObj)
         else:
             print("Nothing to do for package " + packObj['name'])
-            print("runcmd: " + packObj['action'] + " will not be executed as package is not installed" )
+            #print("runcmd: " + packObj['action'] + " will not be executed as package is not installed" )
     elif (packObj['action'] == 'remove' or packObj['action'] == 'purge'):
         package_status = check_package_installed(packObj)
         if (package_status == True):
             manage_package(packObj)
-            print("runcmd: " + packObj['action'] + " will not be executed as it is package removal" )
+            #print("runcmd: " + packObj['action'] + " will not be executed as it is package removal" )
         else:
             print("Nothing to do for package " + packObj['name'])
 

@@ -1,0 +1,51 @@
+write_file:
+  - path: /etc/apache2/sites-available/yourdomain.conf
+    permissions: "0644"
+    owner: 'apache2' 
+    group: 'apache2'
+    content: | 
+         <VirtualHost *:80>
+          ServerAdmin webmaster@localhost
+          ServerName yourdomain
+          ServerAlias www.yourdomain
+          DocumentRoot /var/www/yourdomain
+          ErrorLog ${APACHE_LOG_DIR}/error.log
+          CustomLog ${APACHE_LOG_DIR}/access.log combined
+         </VirtualHost> 
+    #runcmd: sudo a2ensite your_domain.conf;sudo a2dissite 000-default.conf;systemctl restart apache2
+    runcmd: a2dissite 000-default.conf
+
+  - path: /etc/apache2/mods-available/dir.conf
+    permissions: "0644"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+         <IfModule mod_dir.c>
+           DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+         </IfModule>    
+    runcmd: a2enmod dir && a2dismod mpm_event && a2enmod mpm_prefork && a2enmod php7.2
+
+  - path: /var/www/yourdomain/index.html
+    permissions: "0755"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+          <html>
+           <head>
+             <title>Welcome to Yourdomain!</title>
+          </head>
+          <body>
+           <h1>Success!  The yourdomain server block is working!</h1>
+           </body>
+          </html>
+    runcmd: a2ensite yourdomain.conf
+
+  - path: /var/www/yourdomain/index.php
+    permissions: "0755"
+    owner: 'apache2'
+    group: 'apache2'
+    content: |
+          <?php
+          header("Content-Type: text/plain");
+          echo "Hello, world!\n"; 
+    runcmd: systemctl restart apache2
