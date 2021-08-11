@@ -142,13 +142,13 @@ def check_package_installed(packObj):
       if dpkg_out:
           install_status = ast.literal_eval(dpkg_out.decode("UTF-8"))
           if(install_status.get('status') == 'install ok installed' and install_status.get('version') == packObj['version']):
-              print("Package is already installed: " + package_name + ":" + package_version)
+              print("Package: " + package_name + ":" + package_version + " status " + install_status.get('status'))
               return True 
           else:
+              print("Package: " + package_name + ":" + package_version + " status " + install_status.get('status'))
               return False
-
       else:
-          print("Package is not installed:" + package_name + ":" + package_version)
+          print("Package: " + package_name + ":" + package_version + " status " + str(error.strip()))
           return False
       if error:
           print("Error> error " + str(error.strip()))
@@ -193,7 +193,7 @@ def execute_package_manager(packObj):
     print(type(packObj['action']))
     print((packObj['action']))
     action = str(packObj['action'])
-    if not (action == 'install' or action == 'remove'):
+    if not (action == 'install' or action == 'remove' or action == 'purge'):
         print("Unknown action " + packObj['action'] + " for package " + packObj['name']  )
     elif (action == 'install'):
         print("in install condition for " + packObj['name'])
@@ -206,7 +206,7 @@ def execute_package_manager(packObj):
         else:
             print("Nothing to do for package " + packObj['name'])
             print("runcmd: " + packObj['action'] + " will not be executed as package is not installed" )
-    elif (packObj['action'] == 'remove'):
+    elif (packObj['action'] == 'remove' or packObj['action'] == 'purge'):
         package_status = check_package_installed(packObj)
         if (package_status == True):
             manage_package(packObj)
