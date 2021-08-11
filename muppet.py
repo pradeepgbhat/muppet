@@ -40,7 +40,7 @@ def read_yaml(filename):
      exit("Could not load yaml")
   return yaml_content
 
-
+#Execute shell commands in yaml 
 def call_runcmd(artifactObj):
     print(artifactObj['runcmd'])
     try:
@@ -104,7 +104,8 @@ def execute_file_create(fileObj):
         os.chmod(filename, perms)
         print("Changed file " + filename + " permission to " + oct(perms) )
      except OSError as error :
-        print(error) 
+        print(error)
+  #calling for execution of runcmd option
   call_runcmd(fileObj)
 
 def check_package_avail(packObj):
@@ -203,15 +204,16 @@ def execute_package_manager(packObj):
         if (package_status == False) and (check_available == True):
             manage_package(packObj)
             print("runcmd: " + packObj['action'] + " will execute as package is installed" )
+            #calling for run command
             call_runcmd(packObj)
         else:
             print("Nothing to do for package " + packObj['name'])
-            #print("runcmd: " + packObj['action'] + " will not be executed as package is not installed" )
     elif (packObj['action'] == 'remove' or packObj['action'] == 'purge'):
         package_status = check_package_installed(packObj)
         if (package_status == True):
             manage_package(packObj)
-            #print("runcmd: " + packObj['action'] + " will not be executed as it is package removal" )
+            #calling for run command post removal
+            call_runcmd(packObj)
         else:
             print("Nothing to do for package " + packObj['name'])
 
