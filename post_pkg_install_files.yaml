@@ -38,7 +38,7 @@ write_file:
            <h1>Success!  The yourdomain server block is working!</h1>
            </body>
           </html>
-    runcmd: a2ensite yourdomain.conf
+    runcmd: a2ensite yourdomain.conf && ufw allow "Apache Full"
 
   - path: /var/www/yourdomain/index.php
     permissions: "0755"
