@@ -46,7 +46,7 @@ package:
      runcmd: echo "hello"
 ```
 
-# caveats/improvements required
-Handling dependencies of packages.
-Handling dependencies between tasks.
+# caveats
+does not Handling dependencies of packages.
+does not Handling dependencies between tasks.
 
